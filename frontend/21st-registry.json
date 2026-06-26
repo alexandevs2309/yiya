@@ -1,0 +1,62 @@
+[
+  {
+    "name": "dialog",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "skeleton",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "badge",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "avatar",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "tooltip",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "select",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "dropdown-menu",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "separator",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "table",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "input",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "label",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  },
+  {
+    "name": "switch",
+    "sourceType": "direct_name",
+    "addedByCLI": true
+  }
+]

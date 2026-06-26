@@ -1,0 +1,28 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    ".opencode/rules/LEARNED_LESSONS.md",
+    ".opencode/rules/DJANGO_CONVENTIONS.md",
+    ".opencode/rules/REACT_CONVENTIONS.md",
+    ".opencode/rules/POS_BUSINESS_RULES.md"
+  ],
+  "agent": {
+    "backend-diyiya": {
+      "description": "Especialista backend Django/DRF/Channels. Modelos, viewsets, serializers, WebSocket consumers, Celery tasks.",
+      "mode": "subagent"
+    },
+    "frontend-diyiya": {
+      "description": "Especialista frontend React/TypeScript/Tailwind. Páginas POS, cocina, dashboard, shadcn/ui componentes, PWA, offline.",
+      "mode": "subagent"
+    },
+    "ui-ux-diyiya": {
+      "description": "Especialista UI/UX. Framer Motion animaciones, diseño responsive tablet/TV/móvil, modo sol, micro-interacciones, paleta caribeña.",
+      "mode": "subagent"
+    },
+    "devops-diyiya": {
+      "description": "Especialista DevOps. Docker, VPS, Nginx, backups S3, CI/CD, PostgreSQL, Redis.",
+      "mode": "subagent"
+    }
+  }
+}
