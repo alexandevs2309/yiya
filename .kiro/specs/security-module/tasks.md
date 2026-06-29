@@ -11,16 +11,16 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
 
 ## Tasks
 
-- [ ] 1. Extender roles y ejecutar migración
-  - [ ] 1.1 Agregar OWNER, MANAGER, CASHIER, BARTENDER al `Role(TextChoices)` en `backend/apps/accounts/models.py`
+- [x] 1. Extender roles y ejecutar migración
+  - [x] 1.1 Agregar OWNER, MANAGER, CASHIER, BARTENDER al `Role(TextChoices)` en `backend/apps/accounts/models.py`
     - Agregar los cuatro valores al `TextChoices` existente que ya contiene ADMIN, WAITRESS, COOK, UTILITY
     - Ejecutar `python manage.py makemigrations accounts` y `python manage.py migrate`
     - Verificar que usuarios existentes con roles `admin`, `waitress`, `cook`, `utility` se autentican sin cambios
     - _Requirements: 1.1, 1.4, 1.5_
 
 
-- [ ] 2. Crear modelos UserPermissions y WorkSchedule
-  - [ ] 2.1 Agregar `UserPermissions(BaseModel)` a `backend/apps/accounts/models.py`
+- [x] 2. Crear modelos UserPermissions y WorkSchedule
+  - [x] 2.1 Agregar `UserPermissions(BaseModel)` a `backend/apps/accounts/models.py`
     - `OneToOneField(User, related_name="permissions")`, 7 `BooleanField(default=False)`, `discount_limit = IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])`
     - Agregar señal `post_save` en `backend/apps/accounts/apps.py` que crea `UserPermissions` con defaults por rol (tabla completa en Design § UserPermissions)
     - Ejecutar `makemigrations accounts` y `migrate`
@@ -28,7 +28,7 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
   - [ ]* 2.2 Write property test para defaults de permisos por rol
     - **Property 2: Defaults de permisos y descuento por rol**
     - **Validates: Requirements 2.2, 3.2**
-  - [ ] 2.3 Agregar `WorkSchedule(BaseModel)` a `backend/apps/accounts/models.py`
+  - [x] 2.3 Agregar `WorkSchedule(BaseModel)` a `backend/apps/accounts/models.py`
     - `OneToOneField(User, related_name="work_schedule")`, `work_days = JSONField(validators=[validate_work_days])`, `work_start = TimeField()`, `work_end = TimeField()`
     - `clean()` que valida `work_start < work_end` con diferencia ≥ 1 minuto
     - Ejecutar `makemigrations accounts` y `migrate`
@@ -37,8 +37,8 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
     - **Property 19: Validación de coherencia del Work_Schedule**
     - **Validates: Requirements 7.5**
 
-- [ ] 3. Crear app apps/audit/
-  - [ ] 3.1 Crear estructura de la app `backend/apps/audit/`
+- [x] 3. Crear app apps/audit/
+  - [x] 3.1 Crear estructura de la app `backend/apps/audit/`
     - Archivos nuevos: `__init__.py`, `apps.py`, `models.py`, `helpers.py`, `serializers.py`, `views.py`, `urls.py`
     - `models.py`: `AuditLog` (NO hereda BaseModel) con campos `id UUID pk`, `action CharField(db_index=True)`, `actor_id UUID`, `actor_username`, `target_id UUID nullable`, `target_type`, `detail JSONField`, `ip_address GenericIPAddressField`, `timestamp auto_now_add db_index`
     - Sobrescribir `save()` para bloquear updates (raise error si `self.pk` ya existe); sobrescribir `delete()` para lanzar `PermissionError`
@@ -54,7 +54,7 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
   - [ ]* 3.3 Write property test para atomicidad AuditLog
     - **Property 10: Atomicidad AuditLog — fallo del log revierte la acción principal**
     - **Validates: Requirements 4.5, 4.7**
-  - [ ] 3.4 Agregar `AuditLogListView` y `AuditSummaryView` en `backend/apps/audit/views.py`
+  - [x] 3.4 Agregar `AuditLogListView` y `AuditSummaryView` en `backend/apps/audit/views.py`
     - `AuditLogListView`: `GET /api/v1/audit/logs/` con filtros `action`, `actor_id`, `date_from`, `date_to` (ISO 8601), paginación 50 por página, requiere `can_view_reports`
     - `AuditSummaryView`: `GET /api/v1/audit/summary/` agrupa por `action` en rango de fechas, requiere `can_view_reports`
     - Validar que `date_from`/`date_to` sean ISO 8601; retornar 400 si el formato es inválido
@@ -65,14 +65,14 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
     - **Property 31: Parámetros de fecha inválidos producen HTTP 400**
     - **Validates: Requirements 4.6, 13.1, 13.2**
 
-- [ ] 4. Checkpoint — backend base lista
+- [x] 4. Checkpoint — backend base lista
   - Asegurarse de que `makemigrations` y `migrate` se ejecutaron para `accounts` y `audit` en orden
   - Verificar que `AuditLog`, `UserPermissions` y `WorkSchedule` existen en la DB
   - Asegurarse de que todos los tests pasan hasta este punto, preguntar al usuario si hay dudas
 
 
-- [ ] 5. Actualizar accounts/permissions.py
-  - [ ] 5.1 Agregar `HasGranularPermission` e `IsOwnerReadOnly` a `backend/apps/accounts/permissions.py`
+- [x] 5. Actualizar accounts/permissions.py
+  - [x] 5.1 Agregar `HasGranularPermission` e `IsOwnerReadOnly` a `backend/apps/accounts/permissions.py`
     - `HasGranularPermission`: recibe `perm_name` en `__init__`, verifica `request.user.permissions.{perm_name}`, `message` retorna `{"required_permission": perm_name}`
     - `IsOwnerReadOnly`: permite métodos SAFE a rol `owner`; en escritura permite solo las URLs que contienen `change-pin` o `invalidate-session`; resto retorna 403 y crea entrada en `AuditLog` con `action=manage_user, detail.status=denied`
     - No modificar las clases existentes (`IsAdmin`, `IsWaitress`, `IsCook`, `IsAdminOrReadOnly`)
@@ -82,8 +82,8 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
     - **Property 22: Solo owner recibe 403 en métodos de escritura (excepto excepciones)**
     - **Validates: Requirements 2.4, 9.3**
 
-- [ ] 6. Actualizar accounts/serializers.py
-  - [ ] 6.1 Agregar `UserPermissionsSerializer` y `WorkScheduleSerializer` a `backend/apps/accounts/serializers.py`
+- [x] 6. Actualizar accounts/serializers.py
+  - [x] 6.1 Agregar `UserPermissionsSerializer` y `WorkScheduleSerializer` a `backend/apps/accounts/serializers.py`
     - `UserPermissionsSerializer`: todos los campos de `UserPermissions`, writable, solo `can_manage_users` puede modificar
     - `WorkScheduleSerializer`: `work_days`, `work_start`, `work_end` con validaciones (work_start < work_end, work_days lista de enteros [0–6])
     - Extender la respuesta de login (PinLoginView y LoginView) para incluir `permissions` (objeto con 7 booleanos + `discount_limit`) y `default_route` (calculado del `user.role`)
@@ -93,8 +93,8 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
     - **Property 3: PATCH de permisos modifica solo los campos enviados**
     - **Validates: Requirements 2.3**
 
-- [ ] 7. Actualizar accounts/views.py con rate limiting, schedule check y nuevos endpoints
-  - [ ] 7.1 Extender `PinLoginView` en `backend/apps/accounts/views.py`
+- [x] 7. Actualizar accounts/views.py con rate limiting, schedule check y nuevos endpoints
+  - [x] 7.1 Extender `PinLoginView` en `backend/apps/accounts/views.py`
     - Capa 1: verificar `pin_blocked:{user_id}` en Redis → si existe: `log(failed_pin)` + retornar 429 con `remaining_seconds`
     - Capa 2: si PIN inválido: `cache.incr("pin_fails:{user_id}", timeout=300)`; al llegar a 5: `cache.set("pin_blocked:{user_id}", 1, 300)`; `log(failed_pin)`; retornar 401
     - Capa 3: si PIN válido: verificar `WorkSchedule` (día y hora en `America/Santo_Domingo`); si fuera de horario: retornar 403
@@ -109,7 +109,7 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
   - [ ]* 7.3 Write property test para WorkSchedule en autenticación
     - **Property 18: Autenticación fuera del Work_Schedule es rechazada**
     - **Validates: Requirements 7.2**
-  - [ ] 7.4 Agregar los seis nuevos endpoints a `backend/apps/accounts/views.py`
+  - [x] 7.4 Agregar los seis nuevos endpoints a `backend/apps/accounts/views.py`
     - `UserPermissionsView` (GET `/me/permissions/`, PATCH `/users/{id}/permissions/`): GET para cualquier autenticado; PATCH requiere `HasGranularPermission("can_manage_users")`, bloquea self-edit (403), solo actualiza campos enviados
     - `InvalidateSessionView` (POST `/{user_id}/invalidate-session/`): requiere `can_manage_users`, agrega JTI a `blacklist:{jti}` en Redis con TTL restante, `log(manage_user)`, 404 si user no existe, 403 si sin permiso
     - `UnlockUserView` (POST `/{user_id}/unlock/`): requiere `can_manage_users`, elimina `pin_fails` y `pin_blocked` de Redis, `log(manage_user)`, 400 si no estaba bloqueado
@@ -122,11 +122,11 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
     - **Validates: Requirements 8.1, 8.2, 8.3, 8.6**
 
 
-- [ ] 8. Actualizar accounts/urls.py y config/settings/base.py
-  - [ ] 8.1 Agregar las 6 rutas nuevas a `backend/apps/accounts/urls.py`
+- [x] 8. Actualizar accounts/urls.py y config/settings/base.py
+  - [x] 8.1 Agregar las 6 rutas nuevas a `backend/apps/accounts/urls.py`
     - `path("me/permissions/", ...)`, `path("users/<uuid:pk>/permissions/", ...)`, `path("<uuid:user_id>/invalidate-session/", ...)`, `path("<uuid:user_id>/unlock/", ...)`, `path("me/change-pin/", ...)`, `path("users/<uuid:pk>/schedule/", ...)`
     - _Requirements: 2.5, 6.6, 7.5, 8.2, 11.6_
-  - [ ] 8.2 Actualizar JWT en `backend/config/settings/base.py`
+  - [x] 8.2 Actualizar JWT en `backend/config/settings/base.py`
     - Cambiar `ACCESS_TOKEN_LIFETIME` a `timedelta(minutes=15)` y `REFRESH_TOKEN_LIFETIME` a `timedelta(hours=8)`
     - Agregar `UPDATE_LAST_LOGIN` y custom claims serializer para incluir solo `user_id`, `role`, `jti` en el payload del access token
     - _Requirements: 10.1, 10.2, 10.5_
@@ -135,28 +135,28 @@ Principio rector: extender lo que existe antes de crear algo nuevo. Cero abstrac
     - **Property 23: Payload del JWT contiene solo los campos permitidos**
     - **Validates: Requirements 1.1, 1.4, 10.5**
 
-- [ ] 9. Agregar Celery beat task para expiración de WorkSchedule
-  - [ ] 9.1 Crear `check_schedule_expiry` en `backend/apps/accounts/tasks.py`
+- [x] 9. Agregar Celery beat task para expiración de WorkSchedule
+  - [x] 9.1 Crear `check_schedule_expiry` en `backend/apps/accounts/tasks.py`
     - Busca usuarios con `WorkSchedule` cuyo `work_end` pasó hace más de 60 s (en `America/Santo_Domingo`)
     - Para cada usuario: agrega sus JTIs activos a `blacklist:{jti}` en Redis con TTL restante
     - `log(logout, detail={"reason": "schedule_end"})` por cada usuario afectado
     - Registrar en `CELERY_BEAT_SCHEDULE` en `backend/config/settings/base.py` con `crontab(minute='*')`
     - _Requirements: 7.3_
 
-- [ ] 10. Checkpoint — backend completo
+- [x] 10. Checkpoint — backend completo
   - Verificar que todos los endpoints del Design § Nuevos endpoints API responden correctamente
   - Verificar que `python manage.py check` no reporta errores
   - Asegurarse de que todos los tests pasan hasta este punto, preguntar al usuario si hay dudas
 
-- [ ] 11. Extender frontend/src/lib/types.ts
-  - [ ] 11.1 Agregar los 4 roles nuevos y las interfaces de seguridad a `frontend/src/lib/types.ts`
+- [x] 11. Extender frontend/src/lib/types.ts
+  - [x] 11.1 Agregar los 4 roles nuevos y las interfaces de seguridad a `frontend/src/lib/types.ts`
     - Extender `UserRole` con `'owner' | 'manager' | 'cashier' | 'bartender'`
     - Agregar interface `UserPermissions`: 7 campos booleanos + `discount_limit: number`
     - Agregar `default_route: string` y `permissions: UserPermissions` a la interface `AuthResponse`
     - _Requirements: 1.1, 2.1, 12.1_
 
-- [ ] 12. Extender frontend/src/stores/auth.store.ts
-  - [ ] 12.1 Agregar `permissions` al estado Zustand en `frontend/src/stores/auth.store.ts`
+- [x] 12. Extender frontend/src/stores/auth.store.ts
+  - [x] 12.1 Agregar `permissions` al estado Zustand en `frontend/src/stores/auth.store.ts`
     - Agregar `permissions: UserPermissions | null` al estado e interface `AuthState`
     - Actualizar `setAuth` para recibir `permissions` como 4to argumento y persistirlo en el estado cifrado
     - Agregar `setPermissions(permissions: UserPermissions): void`

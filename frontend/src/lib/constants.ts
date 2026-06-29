@@ -1,3 +1,5 @@
+import { useSettingsStore } from "@/stores/settings.store";
+
 export const ECF_TYPES = {
   CONSUMER: "01" as const,
   CREDIT: "02" as const,
@@ -31,6 +33,7 @@ export const PAYMENT_METHODS = {
   MIXED: "mixed" as const,
 };
 
+/** @deprecated Use useSettingsStore for configurable rate */
 export const ITBIS_RATE = 0.18;
 
 export const ALERT_MINUTES = 15;

@@ -57,8 +57,9 @@ export default function LoginPage() {
         description: `Sesión iniciada como ${res.data.user.role === "admin" ? "Administrador" : "Personal"}.`,
       });
       navigate(res.data.default_route || "/tables");
-    } catch {
-      addToast({ title: "Error de acceso", description: "Usuario o contraseña incorrectos", variant: "error" });
+    } catch (err: any) {
+      const msg = err.response?.data?.error || "Usuario o contraseña incorrectos";
+      addToast({ title: "Error de acceso", description: msg, variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -76,8 +77,9 @@ export default function LoginPage() {
         description: `Ingresando con PIN.`,
       });
       navigate(res.data.default_route || "/tables");
-    } catch {
-      addToast({ title: "Acceso denegado", description: "El PIN ingresado es incorrecto", variant: "error" });
+    } catch (err: any) {
+      const msg = err.response?.data?.error || "El PIN ingresado es incorrecto";
+      addToast({ title: "Acceso denegado", description: msg, variant: "error" });
       setPin("");
     } finally {
       setLoading(false);
@@ -90,6 +92,27 @@ export default function LoginPage() {
       handlePinLogin(pin);
     }
   }, [pin]);
+
+  // Listen to physical keyboard events for PIN entry
+  useEffect(() => {
+    if (mode !== "pin" || loading) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Allow number keys 0-9 from both standard keys and numpad
+      if (/^\d$/.test(e.key)) {
+        e.preventDefault();
+        handleKeyPress(e.key);
+      } else if (e.key === "Backspace") {
+        e.preventDefault();
+        handleBackspace();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mode, loading, pin]);
 
   const handleKeyPress = (num: string) => {
     if (pin.length < 4 && !loading) {

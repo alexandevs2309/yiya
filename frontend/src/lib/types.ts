@@ -13,6 +13,12 @@ export interface User {
   session_color: string;
   date_joined: string;
   last_login: string | null;
+  permissions?: UserPermissions;
+  work_schedule?: {
+    work_days: number[];
+    work_start: string;
+    work_end: string;
+  } | null;
 }
 
 export interface UserPermissions {
@@ -74,7 +80,7 @@ export interface MenuItem {
 }
 
 export type OrderStatus = "open" | "billing" | "paid" | "void";
-export type ItemStatus = "pending" | "preparing" | "ready" | "delivered";
+export type ItemStatus = "pending" | "preparing" | "ready" | "delivered" | "served";
 export type PaymentMethod = "cash" | "card" | "transfer" | "mixed";
 
 export interface OrderItem {

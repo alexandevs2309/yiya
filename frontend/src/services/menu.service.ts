@@ -81,6 +81,52 @@ export const menuService = {
       throw new Error("No hay conexión a internet para actualizar este plato.");
     }
   },
+
+  createItem: async (data: any) => {
+    const res = await api.post("/menu/items/", data);
+    // Refresh local cache of items
+    if (navigator.onLine) {
+      const allItemsRes = await api.get("/menu/items/");
+      await db.saveMenuItems(allItemsRes.data.results || allItemsRes.data);
+    }
+    return res;
+  },
+
+  deleteItem: async (id: string) => {
+    const res = await api.delete(`/menu/items/${id}/`);
+    if (navigator.onLine) {
+      const allItemsRes = await api.get("/menu/items/");
+      await db.saveMenuItems(allItemsRes.data.results || allItemsRes.data);
+    }
+    return res;
+  },
+
+  createCategory: async (data: any) => {
+    const res = await api.post("/menu/categories/", data);
+    if (navigator.onLine) {
+      const allCatsRes = await api.get("/menu/categories/");
+      await db.saveCategories(allCatsRes.data.results || allCatsRes.data);
+    }
+    return res;
+  },
+
+  updateCategory: async (id: string, data: any) => {
+    const res = await api.patch(`/menu/categories/${id}/`, data);
+    if (navigator.onLine) {
+      const allCatsRes = await api.get("/menu/categories/");
+      await db.saveCategories(allCatsRes.data.results || allCatsRes.data);
+    }
+    return res;
+  },
+
+  deleteCategory: async (id: string) => {
+    const res = await api.delete(`/menu/categories/${id}/`);
+    if (navigator.onLine) {
+      const allCatsRes = await api.get("/menu/categories/");
+      await db.saveCategories(allCatsRes.data.results || allCatsRes.data);
+    }
+    return res;
+  },
 };
 export default menuService;
 

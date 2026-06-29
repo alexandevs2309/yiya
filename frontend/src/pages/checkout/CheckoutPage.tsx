@@ -2,14 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ordersService } from "@/services/orders.service";
-import { formatRD, calcITBIS, calcTotal } from "@/lib/utils";
-import { RNC_REGEX } from "@/lib/constants";
+import { formatRD, calcITBIS, calcTotal, validateRncCedula } from "@/lib/utils";
+import { useSettingsStore } from "@/stores/settings.store";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useAudio } from "@/hooks/useAudio";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle, Wallet, Landmark, Banknote, Layers, ExternalLink, Loader2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, CheckCircle, Wallet, Landmark, Banknote, Layers, ExternalLink, Loader2, AlertTriangle, Printer } from "lucide-react";
 import type { Order } from "@/lib/types";
+import { printReceipt } from "@/lib/printHelper";
 
 const TIP_OPTIONS = [0, 10, 15, 18];
 const PAYMENT_METHODS = [
@@ -92,15 +93,13 @@ export default function CheckoutPage() {
   // Reset fields when payment method changes
   useEffect(() => {
     if (method === "mixed" && order) {
-      const subtotal = order.subtotal ?? order.items.reduce((s, i) => s + i.total_price, 0);
-      const itbis = calcITBIS(subtotal);
-      const tip = subtotal * (tipPercent / 100);
-      const total = calcTotal(subtotal, itbis, tip);
-      
-      // Default to 50/50 split initially for convenience
-      const half = Math.round((total / 2) * 100) / 100;
+      const sub = parseFloat(String(order.subtotal ?? order.items.reduce((s, i) => s + i.total_price, 0))) || 0;
+      const itbisVal = calcITBIS(sub, useSettingsStore.getState().settings.itbisRate / 100);
+      const tipVal = sub * (tipPercent / 100);
+      const totalVal = calcTotal(sub, itbisVal, tipVal);
+      const half = Math.round((totalVal / 2) * 100) / 100;
       setMixedCash(half.toString());
-      setMixedOther((total - half).toFixed(2));
+      setMixedOther((totalVal - half).toFixed(2));
     } else {
       setAmountReceived("");
     }
@@ -113,8 +112,8 @@ export default function CheckoutPage() {
     </div>
   );
 
-  const subtotal = order.subtotal ?? order.items.reduce((s, i) => s + i.total_price, 0);
-  const itbis = calcITBIS(subtotal);
+  const subtotal = parseFloat(String(order.subtotal ?? order.items.reduce((s, i) => s + parseFloat(String(i.total_price)), 0))) || 0;
+  const itbis = calcITBIS(subtotal, useSettingsStore.getState().settings.itbisRate / 100);
   const tip = subtotal * (tipPercent / 100);
   const total = calcTotal(subtotal, itbis, tip);
 
@@ -134,7 +133,7 @@ export default function CheckoutPage() {
       ? (mixedCashNum + mixedOtherNum >= total && mixedCashNum >= 0 && mixedOtherNum >= 0)
       : (method !== "cash" || received >= total);
 
-  const isRncValid = rnc === "" || RNC_REGEX.test(rnc);
+  const isRncValid = rnc === "" || validateRncCedula(rnc);
 
   // Auto-calculate remaining on input change
   const handleMixedCashChange = (val: string) => {
@@ -328,9 +327,18 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          <Button className="w-full h-12 rounded-xl text-sm font-bold bg-sky-500 hover:bg-sky-600 text-white" onClick={() => navigate("/tables")}>
-            Volver a mesas
-          </Button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => printReceipt(order)}
+              className="flex-1 h-12 rounded-xl border border-border bg-bg-elevated hover:bg-bg-active text-text-secondary hover:text-text-primary text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Printer className="h-4 w-4" />
+              Imprimir Ticket
+            </button>
+            <Button className="flex-1 h-12 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-600 text-white" onClick={() => navigate("/tables")}>
+              Volver a mesas
+            </Button>
+          </div>
         </motion.div>
       </div>
     );
@@ -550,13 +558,22 @@ export default function CheckoutPage() {
           </div>
 
           {/* Action button */}
-          <Button
-            onClick={handlePay}
-            disabled={loading || !isValid || !isRncValid}
-            className="w-full h-14 text-base font-bold rounded-xl bg-sky-500 hover:bg-sky-600 text-white shadow-button"
-          >
-            {loading ? "Procesando..." : `Cobrar ${formatRD(total)}`}
-          </Button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => printReceipt(order)}
+              className="flex-1 h-14 rounded-xl border border-border bg-bg-elevated hover:bg-bg-active text-text-secondary hover:text-text-primary text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Printer className="h-4 w-4" />
+              Pre-cuenta
+            </button>
+            <Button
+              onClick={handlePay}
+              disabled={loading || !isValid || !isRncValid}
+              className="flex-[2] h-14 text-base font-bold rounded-xl bg-sky-500 hover:bg-sky-600 text-white shadow-button"
+            >
+              {loading ? "Procesando..." : `Cobrar ${formatRD(total)}`}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

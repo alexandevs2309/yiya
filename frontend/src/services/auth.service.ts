@@ -16,6 +16,8 @@ export const authService = {
 
   // Security Module
   getMyPermissions: () => api.get("/auth/me/permissions/"),
+  updatePermissions: (id: string, perms: any) =>
+    api.patch(`/auth/users/${id}/permissions/`, perms),
   invalidateSession: (userId: string, reason = "") =>
     api.post(`/auth/${userId}/invalidate-session/`, { reason }),
   unlockUser: (userId: string) => api.post(`/auth/${userId}/unlock/`),

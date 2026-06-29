@@ -10,6 +10,7 @@ import { cashierService } from "@/services/cashier.service";
 import type { CashRegister } from "@/lib/types";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
+import { printCashClosing } from "@/lib/printHelper";
 import {
   LayoutGrid,
   ChefHat,
@@ -22,6 +23,8 @@ import {
   Wallet,
   Sun,
   Moon,
+  Package,
+  ShoppingCart,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -30,6 +33,8 @@ const NAV_ITEMS = [
   { id: "orders", label: "Pedidos", icon: ClipboardList, path: "/orders", roles: ["admin", "waitress", "manager", "cashier"] },
   { id: "dashboard", label: "Dashboard", icon: BarChart3, path: "/dashboard", roles: ["admin", "owner", "manager"] },
   { id: "clients", label: "Clientes", icon: Users, path: "/clients", roles: ["admin", "manager"] },
+  { id: "inventory", label: "Inventario", icon: Package, path: "/inventory", roles: ["admin", "manager", "cashier"] },
+  { id: "purchases", label: "Compras", icon: ShoppingCart, path: "/purchases", roles: ["admin", "manager"] },
   { id: "reports", label: "Reportes", icon: FileText, path: "/reports", roles: ["admin", "owner", "manager"] },
   { id: "settings", label: "Ajustes", icon: Settings, path: "/settings", roles: ["admin"] },
 ];
@@ -55,6 +60,7 @@ export function Sidebar() {
 
   // Cash Register State
   const [activeRegister, setActiveRegister] = useState<CashRegister | null>(null);
+  const [closeSummary, setCloseSummary] = useState<any | null>(null);
   const { addToast } = useToast();
   const [cashDialogOpen, setCashDialogOpen] = useState(false);
   const [initialAmount, setInitialAmount] = useState("2000");
@@ -105,13 +111,12 @@ export function Sidebar() {
         return;
       }
       const res = await cashierService.close(activeRegister.id, amount, notes);
-      setActiveRegister(null);
+      setCloseSummary(res.data);
       addToast({
-        title: "Caja cerrada",
-        description: `Caja cerrada. Arqueo completado con diferencia de ${formatRD(res.data.difference || 0)}`,
+        title: "Arqueo completado",
+        description: `Caja cerrada. Revisa el resumen de arqueo.`,
         variant: "success",
       });
-      setCashDialogOpen(false);
       setActualCash("");
       setNotes("");
     } catch {
@@ -297,15 +302,101 @@ export function Sidebar() {
       {/* Cash Drawer Open/Close Modal */}
       <Modal
         open={cashDialogOpen}
-        onOpenChange={setCashDialogOpen}
-        title={activeRegister ? "Arqueo y Cierre de Caja" : "Apertura de Caja"}
+        onOpenChange={(open) => {
+          setCashDialogOpen(open);
+          if (!open && closeSummary) {
+            setActiveRegister(null);
+            setCloseSummary(null);
+          }
+        }}
+        title={closeSummary ? "Arqueo y Ventas del Turno" : activeRegister ? "Arqueo y Cierre de Caja" : "Apertura de Caja"}
         description={
-          activeRegister
-            ? "Verifica las ventas del día y realiza la conciliación del efectivo real en caja."
-            : "Especifica el fondo inicial de efectivo para abrir la gaveta de dinero y comenzar el turno."
+          closeSummary
+            ? "Resumen oficial del arqueo de caja y ventas consolidadas del turno."
+            : activeRegister
+              ? "Verifica las ventas del día y realiza la conciliación del efectivo real en caja."
+              : "Especifica el fondo inicial de efectivo para abrir la gaveta de dinero y comenzar el turno."
         }
       >
-        {!activeRegister ? (
+        {closeSummary ? (
+          <div className="space-y-4 pt-2 text-xs text-text-secondary">
+            <div className="border-2 border-dashed border-border p-4 bg-bg-elevated/10 rounded-xl space-y-3 font-mono">
+              <p className="text-center font-bold text-sm tracking-wider border-b border-border/60 pb-2">
+                D' YIYA SAMANÁ<br />
+                REPORTE Z / ARQUEO
+              </p>
+              <div className="flex justify-between">
+                <span>Fecha Cierre:</span>
+                <span>{new Date(closeSummary.closed_at || "").toLocaleDateString()} {new Date(closeSummary.closed_at || "").toLocaleTimeString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Abierto por:</span>
+                <span>{closeSummary.opened_by_name || "Admin"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Cerrado por:</span>
+                <span>{closeSummary.closed_by_name || user?.first_name || "Admin"}</span>
+              </div>
+              <div className="border-t border-border/40 my-2 pt-2" />
+              <div className="flex justify-between font-bold text-text-primary text-sm">
+                <span>Fondo Inicial:</span>
+                <span>{formatRD(parseFloat(closeSummary.initial_amount))}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Efectivo Esperado (Ventas):</span>
+                <span>{formatRD(parseFloat(closeSummary.expected_cash) - parseFloat(closeSummary.initial_amount))}</span>
+              </div>
+              <div className="flex justify-between font-bold text-text-primary">
+                <span>Total Esperado en Caja:</span>
+                <span>{formatRD(parseFloat(closeSummary.expected_cash))}</span>
+              </div>
+              <div className="flex justify-between font-bold text-text-primary text-sm">
+                <span>Efectivo Contado:</span>
+                <span>{formatRD(parseFloat(closeSummary.actual_cash))}</span>
+              </div>
+              <div className="border-t border-border/40 my-2 pt-2" />
+              <div className="flex justify-between font-extrabold text-base">
+                <span>Diferencia:</span>
+                <span className={parseFloat(closeSummary.difference) < 0 ? "text-danger" : "text-success"}>
+                  {parseFloat(closeSummary.difference) < 0 ? "" : "+"}{formatRD(parseFloat(closeSummary.difference))}
+                </span>
+              </div>
+              {closeSummary.notes && (
+                <div className="mt-2 text-[10px] text-text-tertiary">
+                  <span className="font-bold">Notas:</span> {closeSummary.notes}
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  printCashClosing(closeSummary);
+                  addToast({
+                    title: "Impresión de arqueo",
+                    description: "Enviando ticket de arqueo a la impresora térmica...",
+                    variant: "success",
+                  });
+                }}
+                className="flex-1 h-11 rounded-xl border border-border bg-bg-elevated text-xs font-semibold text-text-secondary hover:bg-bg-active transition-all"
+              >
+                Imprimir Arqueo
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveRegister(null);
+                  setCloseSummary(null);
+                  setCashDialogOpen(false);
+                }}
+                className="flex-1 h-11 rounded-xl bg-accent hover:bg-accent-hover text-xs font-bold text-white transition-all shadow-button"
+              >
+                Finalizar y Salir
+              </button>
+            </div>
+          </div>
+        ) : !activeRegister ? (
           <form onSubmit={handleOpenRegister} className="space-y-4 pt-2">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-text-secondary uppercase">

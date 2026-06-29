@@ -8,6 +8,8 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useToast } from "@/components/ui/toast";
 import { ordersService } from "@/services/orders.service";
 import { formatRD, calcITBIS, calcTotal } from "@/lib/utils";
+import { useSettingsStore } from "@/stores/settings.store";
+import { printOrderTicket } from "@/lib/printHelper";
 
 const fastTransition = { type: "tween", duration: 0.15, ease: [0.16, 1, 0.3, 1] } as const;
 
@@ -54,7 +56,8 @@ export function OrderPanel() {
   const hasItems = items.length > 0;
 
   const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
-  const itbis = calcITBIS(subtotal);
+  const itbisRate = useSettingsStore((s) => s.settings.itbisRate) / 100;
+  const itbis = calcITBIS(subtotal, itbisRate);
   const total = calcTotal(subtotal, itbis);
 
   const handleSendToKitchen = async () => {
@@ -79,6 +82,12 @@ export function OrderPanel() {
         res.data.id,
         res.data.items.map((i: any) => i.id),
       );
+      printOrderTicket({
+        tableNumber: activeTable?.number ?? tableId ?? "",
+        items: items.map((i) => ({ qty: i.quantity, name: i.name, notes: i.notes, modifiers: Array.isArray(i.modifiers) ? i.modifiers.join(", ") : i.modifiers })),
+        waitressName: user.first_name || user.username,
+        type: "kitchen",
+      });
       setActiveOrderId(res.data.id);
       clear();
       addToast({ title: "✅ Enviado a cocina", description: `Mesa #${activeTable?.number} — ${items.length} plato${items.length > 1 ? "s" : ""}`, variant: "success" });

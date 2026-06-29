@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Download,
@@ -11,14 +11,18 @@ import {
   CheckCircle2,
   ChevronRight,
   Info,
+  DollarSign,
+  ClipboardList,
+  Users,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { formatRD } from "@/lib/utils";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { ecfService } from "@/services/ecf.service";
 import { purchasesService } from "@/services/purchases.service";
+import { ordersService } from "@/services/orders.service";
 import { db } from "@/services/db";
-import type { ECFDocument, Purchase, ECFStatus } from "@/lib/types";
+import type { ECFDocument, Purchase, ECFStatus, Order } from "@/lib/types";
 
 
 
@@ -53,6 +57,10 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(false);
   const [realSales, setRealSales] = useState<ECFDocument[]>([]);
   const [realPurchases, setRealPurchases] = useState<Purchase[]>([]);
+
+  // KPI & chart state
+  const [allPaidOrders, setAllPaidOrders] = useState<Order[]>([]);
+  const [kpiLoading, setKpiLoading] = useState(true);
 
   useEffect(() => {
     loadRealData();

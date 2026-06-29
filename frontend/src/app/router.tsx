@@ -15,6 +15,8 @@ const ClientsPage = lazy(() => import("@/pages/clients/ClientsPage"));
 const OrdersPage = lazy(() => import("@/pages/orders/OrdersPage"));
 const SettingsPage = lazy(() => import("@/pages/settings/SettingsPage"));
 const OrderPage = lazy(() => import("@/pages/order/OrderPage"));
+const InventoryPage = lazy(() => import("@/pages/inventory/InventoryPage"));
+const PurchasesPage = lazy(() => import("@/pages/purchases/PurchasesPage"));
 
 function Lazy({ children }: { children: React.ReactNode }) {
   return (
@@ -59,6 +61,8 @@ export const router = createBrowserRouter([
       { path: "dashboard", element: <Lazy><DashboardPage /></Lazy> },
       { path: "reports", element: <Lazy><ReportsPage /></Lazy> },
       { path: "clients", element: <Lazy><ClientsPage /></Lazy> },
+      { path: "inventory", element: <Lazy><InventoryPage /></Lazy> },
+      { path: "purchases", element: <Lazy><PurchasesPage /></Lazy> },
       { path: "settings", element: <Lazy><SettingsPage /></Lazy> },
       // /admin is the default_route returned by backend for admins — redirect to settings
       { path: "admin", element: <Navigate to="/settings" replace /> },

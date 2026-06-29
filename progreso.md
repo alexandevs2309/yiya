@@ -75,8 +75,7 @@ Basado en la auditoría y el spec del `AGENTS.md`, esto es lo que falta organiza
 | **Gestión de `price_today`** | No hay UI para que el admin cambie el precio del día de mariscos. |
 
 ---
-
-## M6: Reportes — 0%
+## M6: Reportes — 10%
 
 | Pendiente | Detalle |
 |---|---|
@@ -88,7 +87,7 @@ Basado en la auditoría y el spec del `AGENTS.md`, esto es lo que falta organiza
 
 ---
 
-## M7: Clientes — 0%
+## M7: Clientes — 5%
 
 | Pendiente | Detalle |
 |---|---|
@@ -99,13 +98,15 @@ Basado en la auditoría y el spec del `AGENTS.md`, esto es lo que falta organiza
 
 ---
 
-## M8: Inventario — 0%
+## M8: Inventario — 30%
 
 | Pendiente | Detalle |
 |---|---|
 | **Proveedores** | No hay modelo de proveedor (solo `Purchase` con datos inline). |
-| **Stock de perecibles** | Fuera de scope v1 según spec, pero sin iniciar. |
-| **Alertas de stock bajo** | No implementado. |
+| **Stock de perecibles** | Fuera de scope v1 según spec. |
+| **Alertas de stock bajo** | Backend soporta filtro `?low_stock=true`. Frontend conectado al API. |
+| **Recepción de inventario** | Backend tiene `StockMovement`. Falta UI de "Recibir" con formulario. |
+| **CRUD de productos/categorías** | Backend listo. Frontend solo lectura (grid/list). Falta UI de crear/editar. |
 
 ---
 
@@ -145,9 +146,9 @@ M2  Cocina       ██████████████░░░░░░  7
 M3  Caja         ████████░░░░░░░░░░░░  40%
 M4  e-CF         ██████████░░░░░░░░░░  50%
 M5  Admin        ████░░░░░░░░░░░░░░░░  20%
-M6  Reportes     ░░░░░░░░░░░░░░░░░░░░   0%
-M7  Clientes     ░░░░░░░░░░░░░░░░░░░░   0%
-M8  Inventario   ░░░░░░░░░░░░░░░░░░░░   0%
+M6  Reportes     ██░░░░░░░░░░░░░░░░░░  10%
+M7  Clientes     █░░░░░░░░░░░░░░░░░░░   5%
+M8  Inventario   ██████░░░░░░░░░░░░░░  30%
 M9  PWA/Infra    ██████░░░░░░░░░░░░░░  30%
 M10 UX Pulido    ██░░░░░░░░░░░░░░░░░░  10%
 ```

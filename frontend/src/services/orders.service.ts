@@ -207,6 +207,25 @@ export const ordersService = {
     }
   },
 
+  updateItemStatus: async (id: string, itemId: string, status: "pending" | "preparing" | "ready" | "served") => {
+    if (navigator.onLine && !id.startsWith("offline_")) {
+      return api.post(`/orders/${id}/update_item_status/`, { item_id: itemId, status });
+    } else {
+      const order = await db.getOrder(id);
+      if (order) {
+        order.items = order.items.map((item) => {
+          if (item.id === itemId) {
+            return { ...item, status, prepared_at: status === "ready" ? new Date().toISOString() : item.prepared_at };
+          }
+          return item;
+        });
+        await db.saveOrder(order);
+        return { data: { detail: `Estado actualizado a ${status} localmente` } } as any;
+      }
+      throw new Error("Comanda no encontrada.");
+    }
+  },
+
   requestBill: async (id: string) => {
     if (navigator.onLine && !id.startsWith("offline_")) {
       const res = await api.post(`/orders/${id}/request_bill/`);
@@ -309,6 +328,151 @@ export const ordersService = {
       throw new Error("Comanda no encontrada.");
     }
   },
+
+  // ------------------------------------------------------------------
+  // B.1 — Agregar items a orden existente
+  // ------------------------------------------------------------------
+  addItems: async (orderId: string, items: any[]) => {
+    if (navigator.onLine && !orderId.startsWith("offline_")) {
+      const res = await api.post(`/orders/${orderId}/add_items/`, { items });
+      await db.saveOrder(res.data);
+      return res;
+    } else {
+      // Offline: agregar items localmente
+      const order = await db.getOrder(orderId);
+      if (order) {
+        const newItems = items.map((item: any) => ({
+          id: generateUUID(),
+          order: orderId,
+          menu_item: item.menu_item,
+          name: item.name,
+          unit_price: parseFloat(item.unit_price),
+          quantity: item.quantity,
+          modifiers: item.modifiers || [],
+          notes: item.notes || "",
+          status: "preparing" as const,
+          prepared_at: null,
+          total_price: parseFloat(item.unit_price) * item.quantity,
+          created_at: new Date().toISOString(),
+        }));
+        order.items = [...(order.items || []), ...newItems];
+        order.synced = false;
+        await db.saveOrder(order);
+        return { data: order } as any;
+      }
+      throw new Error("Comanda no encontrada.");
+    }
+  },
+
+  // ------------------------------------------------------------------
+  // B.2 — Anular orden
+  // ------------------------------------------------------------------
+  voidOrder: async (orderId: string, reason: string) => {
+    return api.post(`/orders/${orderId}/void/`, { reason });
+  },
+
+  // ------------------------------------------------------------------
+  // B.3 — Aplicar descuento
+  // ------------------------------------------------------------------
+  applyDiscount: async (orderId: string, percentage: number, reason: string) => {
+    return api.post(`/orders/${orderId}/apply_discount/`, { percentage, reason });
+  },
+
+  // ------------------------------------------------------------------
+  // M1 — Dividir comanda
+  // ------------------------------------------------------------------
+  split: async (orderId: string, itemsToSplit: { item_id: string; quantity: number }[]) => {
+    if (navigator.onLine && !orderId.startsWith("offline_")) {
+      return api.post(`/orders/${orderId}/split/`, { items: itemsToSplit });
+    } else {
+      // Offline split
+      const order = await db.getOrder(orderId);
+      if (order) {
+        const offlineUuid = `offline_${generateUUID()}`;
+        const newOrderItems: any[] = [];
+
+        for (const splitInfo of itemsToSplit) {
+          const item = order.items.find((i) => i.id === splitInfo.item_id);
+          if (item) {
+            const qty = splitInfo.quantity;
+            if (qty === item.quantity) {
+              // Move item completely
+              item.order = offlineUuid;
+              newOrderItems.push(item);
+              order.items = order.items.filter((i) => i.id !== splitInfo.item_id);
+            } else {
+              // Split item quantity
+              item.quantity -= qty;
+              item.total_price = item.unit_price * item.quantity;
+
+              newOrderItems.push({
+                id: generateUUID(),
+                order: offlineUuid,
+                menu_item: item.menu_item,
+                name: item.name,
+                unit_price: item.unit_price,
+                quantity: qty,
+                modifiers: item.modifiers || [],
+                notes: item.notes || "",
+                status: item.status,
+                prepared_at: item.prepared_at,
+                total_price: item.unit_price * qty,
+                created_at: new Date().toISOString(),
+              });
+            }
+          }
+        }
+
+        // Create new offline order
+        const subtotal = newOrderItems.reduce((s, i) => s + i.total_price, 0);
+        const itbis = Math.round(subtotal * 0.18 * 100) / 100;
+        const total = Math.round((subtotal + itbis) * 100) / 100;
+
+        const newOrder: any = {
+          id: offlineUuid,
+          id_short: offlineUuid.slice(8, 16).toUpperCase(),
+          table: order.table,
+          table_number: order.table_number,
+          waitress: order.waitress,
+          status: "open",
+          diners: 1,
+          subtotal,
+          itbis,
+          tip: 0,
+          total,
+          payment_method: null,
+          amount_received: null,
+          change: null,
+          receipt_number: null,
+          offline_id: offlineUuid,
+          synced: false,
+          items: newOrderItems,
+          created_at: new Date().toISOString(),
+          closed_at: null,
+        };
+
+        // Recalculate original order totals
+        const origSubtotal = order.items.reduce((s, i) => s + i.total_price, 0);
+        const origItbis = Math.round(origSubtotal * 0.18 * 100) / 100;
+        const origTotal = Math.round((origSubtotal + origItbis) * 100) / 100;
+
+        order.subtotal = origSubtotal;
+        order.itbis = origItbis;
+        order.total = origTotal;
+        order.synced = false;
+
+        await db.saveOrder(order);
+        await db.saveOrder(newOrder);
+
+        return {
+          data: {
+            original_order: order,
+            new_order: newOrder,
+          },
+        } as any;
+      }
+      throw new Error("Comanda no encontrada.");
+    }
+  },
 };
 export default ordersService;
-

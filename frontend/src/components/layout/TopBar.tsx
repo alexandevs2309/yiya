@@ -1,12 +1,67 @@
+import { useState } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUIStore } from "@/stores/ui.store";
-import { Search, Bell, Menu, ChevronDown } from "lucide-react";
+import { useOfflineStore } from "@/stores/offline.store";
+import { NetworkBadge } from "./NetworkBadge";
+import { db } from "@/services/db";
+import { formatRD } from "@/lib/utils";
+import { Search, Bell, Menu, ChevronDown, CloudUpload, RefreshCw, X, AlertTriangle } from "lucide-react";
 
 export function TopBar() {
   const user = useAuthStore((s) => s.user);
   const searchQuery = useUIStore((s) => s.searchQuery);
   const setSearchQuery = useUIStore((s) => s.setSearchQuery);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+
+  // Unsynced orders queue state
+  const isOnline = useOfflineStore((s) => s.isOnline);
+  const pendingOrders = useOfflineStore((s) => s.pendingOrders);
+  const [showQueueModal, setShowQueueModal] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
+  const handleRetryOrder = async (orderId: string) => {
+    setSyncing(true);
+    try {
+      const order = await db.getOrder(orderId);
+      if (order) {
+        order.sync_attempts = 0;
+        await db.saveOrder(order);
+        await useOfflineStore.getState().loadPendingOrders();
+        
+        // Force trigger of useOfflineSync useEffect hook by toggling isOnline
+        if (isOnline) {
+          useOfflineStore.getState().setIsOnline(false);
+          useOfflineStore.getState().setIsOnline(true);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to retry sync:", err);
+    } finally {
+      setTimeout(() => setSyncing(false), 800);
+    }
+  };
+
+  const handleForceSyncAll = async () => {
+    setSyncing(true);
+    try {
+      for (const order of pendingOrders) {
+        const o = await db.getOrder(order.id);
+        if (o) {
+          o.sync_attempts = 0;
+          await db.saveOrder(o);
+        }
+      }
+      await useOfflineStore.getState().loadPendingOrders();
+      if (isOnline) {
+        useOfflineStore.getState().setIsOnline(false);
+        useOfflineStore.getState().setIsOnline(true);
+      }
+    } catch (err) {
+      console.error("Failed to force sync all:", err);
+    } finally {
+      setTimeout(() => setSyncing(false), 1200);
+    }
+  };
 
   return (
     <header className="flex h-14 items-center gap-4 border-b border-border bg-bg-surface px-4 shadow-topbar shrink-0">
@@ -46,6 +101,23 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-4 ml-auto">
+        {/* Network status badge */}
+        <NetworkBadge />
+
+        {/* Sync queue indicator */}
+        {pendingOrders.length > 0 && (
+          <button
+            onClick={() => setShowQueueModal(true)}
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-[#F97316] bg-[#F97316]/10 hover:bg-[#F97316]/20 transition-colors"
+            title={`${pendingOrders.length} comanda(s) pendientes de sincronización`}
+          >
+            <CloudUpload className="h-5 w-5 animate-pulse" />
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#F97316] text-[9px] font-extrabold text-white">
+              {pendingOrders.length}
+            </span>
+          </button>
+        )}
+
         {/* Notifications with badge '3' */}
         <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-colors">
           <Bell className="h-5 w-5" />
@@ -79,6 +151,91 @@ export function TopBar() {
           <ChevronDown className="h-4 w-4 text-text-muted group-hover:text-text-secondary transition-colors shrink-0" />
         </div>
       </div>
+
+      {/* Sync Queue Modal */}
+      {showQueueModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-bg-surface border border-border rounded-2xl shadow-modal overflow-hidden flex flex-col p-6 space-y-4">
+            <div className="flex justify-between items-center pb-2 border-b border-border">
+              <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
+                <CloudUpload className="h-4.5 w-4.5 text-[#F97316]" />
+                Cola de Sincronización Offline
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowQueueModal(false)}
+                className="p-1 rounded hover:bg-bg-elevated text-text-secondary"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <p className="text-[10px] text-text-secondary">
+              Estas comandas se crearon o cobraron sin internet y se están reintentando subir al servidor.
+            </p>
+
+            <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1 scrollbar-thin">
+              {pendingOrders.map((o) => {
+                const isFailed = (o.sync_attempts || 0) >= 3;
+                return (
+                  <div
+                    key={o.id}
+                    className="p-3.5 rounded-xl border border-border bg-bg-elevated/5 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-xs font-bold text-text-primary">Mesa #{o.table_number || o.table}</p>
+                      <p className="text-[9px] text-text-secondary mt-0.5">
+                        ID: {o.id_short} · {formatRD(o.total || 0)}
+                      </p>
+                      {isFailed && (
+                        <p className="text-[8px] text-danger font-semibold flex items-center gap-0.5 mt-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Sincronización suspendida (3 fallos)
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={syncing || !isOnline}
+                        onClick={() => handleRetryOrder(o.id)}
+                        className="h-8 w-8 rounded-lg bg-bg-elevated hover:bg-bg-active text-text-secondary hover:text-text-primary disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center border border-border"
+                        title="Reintentar ahora"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-border mt-2">
+              <button
+                type="button"
+                disabled={syncing || !isOnline}
+                onClick={handleForceSyncAll}
+                className="flex-1 h-10 rounded-xl bg-sky-500 hover:bg-sky-600 text-xs font-bold text-white transition-all shadow-button flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {syncing ? (
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3.5 w-3.5" />
+                )}
+                Sincronizar Todo
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowQueueModal(false)}
+                className="flex-1 h-10 rounded-xl border border-border bg-bg-elevated hover:bg-bg-active text-xs font-semibold text-text-secondary transition-all"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

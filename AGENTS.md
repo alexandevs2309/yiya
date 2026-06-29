@@ -97,6 +97,30 @@ owner→100% | admin→100% | manager→20% | cashier→10% | waitress→5% | re
 | M9: PWA/Infra | IndexedDB offline, sync queue, Docker, S3 backup | ⬜ |
 | M10: UX Pulido | Modo sol, háptico, onboarding, animaciones | ⬜ |
 
+
+
+## Brechas críticas (bloqueantes de producción)
+- NetworkBadge existe pero NO está renderizado en el navbar
+- Reportes 606/607 mockeados en frontend — no generan archivos reales
+- Nota de Crédito e-CF tipo 04 no implementada (obligatoria por ley al anular)
+- Validación RNC Módulo 11 ausente en frontend y backend
+- Propinas de ley (10%) no se acumulan por `waitress` en el turno
+- UI de Sync Queue offline — cajero no ve comandas encoladas
+- docker-compose.prod.yml pendiente (corre en runserver actualmente)
+
+## Visión premium v2 (post-piloto)
+- Plano de salón drag & drop con colores por tiempo (verde/ámbar/rojo)
+- Modificadores en cascada — Modifier → ModifierOption con price_delta
+- QR ordering — comensal ordena desde su celular escaneando la mesa
+- CRM del comensal — historial, favoritos, alergias
+- Reservaciones con confirmación por WhatsApp
+- Sugerencias AI por mesa basadas en historial
+
+## Preguntas abiertas
+- [ ] Modelo impresora térmica (cliente decide — define si ESC/POS va en browser o servicio local)
+- [ ] Credenciales Alanube/ef2 sandbox
+- [ ] ¿Reservaciones entran en v1?
+
 ## Context sources
 - `CONTEXTO.md` — Business context document
 - `.opencode/rules/` — Conventions and learned lessons

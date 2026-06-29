@@ -67,6 +67,53 @@ export const tablesService = {
       throw new Error("No hay conexión a internet para actualizar la mesa.");
     }
   },
+
+  createTable: async (data: any) => {
+    const res = await api.post("/tables/", data);
+    if (navigator.onLine) {
+      const allTablesRes = await api.get("/tables/");
+      await db.saveTables(allTablesRes.data.results || allTablesRes.data);
+    }
+    return res;
+  },
+
+  updateTable: async (id: string, data: any) => {
+    const res = await api.patch(`/tables/${id}/`, data);
+    if (navigator.onLine) {
+      const allTablesRes = await api.get("/tables/");
+      await db.saveTables(allTablesRes.data.results || allTablesRes.data);
+    }
+    return res;
+  },
+
+  deleteTable: async (id: string) => {
+    const res = await api.delete(`/tables/${id}/`);
+    if (navigator.onLine) {
+      const allTablesRes = await api.get("/tables/");
+      await db.saveTables(allTablesRes.data.results || allTablesRes.data);
+    }
+    return res;
+  },
+
+  listZones: async () => {
+    const res = await api.get("/tables/zones/");
+    return res;
+  },
+
+  createZone: async (data: any) => {
+    const res = await api.post("/tables/zones/", data);
+    return res;
+  },
+
+  updateZone: async (id: string, data: any) => {
+    const res = await api.patch(`/tables/zones/${id}/`, data);
+    return res;
+  },
+
+  deleteZone: async (id: string) => {
+    const res = await api.delete(`/tables/zones/${id}/`);
+    return res;
+  },
 };
 export default tablesService;
 
