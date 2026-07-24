@@ -153,6 +153,8 @@ class BusinessConfig(models.Model):
     address = models.CharField(max_length=300, blank=True, default='Samaná, República Dominicana', verbose_name='Dirección')
     phone = models.CharField(max_length=20, blank=True, verbose_name='Teléfono')
     email = models.EmailField(blank=True, verbose_name='Correo')
+    municipio = models.CharField(max_length=100, blank=True, default='Samaná', verbose_name='Municipio')
+    provincia = models.CharField(max_length=100, blank=True, default='Samaná', verbose_name='Provincia')
     logo = models.ImageField(upload_to='brand/', blank=True, null=True, verbose_name='Logo')
     updated_at = models.DateTimeField(auto_now=True)
 

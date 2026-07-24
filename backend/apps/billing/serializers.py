@@ -110,6 +110,7 @@ class PaymentSerializer(serializers.ModelSerializer):
                         status='pending',
                     )
                     motor_doc_id = None
+                    motor_token = ''
                     try:
                         result = send_ecf(doc)
                         doc.status = 'sent'
@@ -118,6 +119,7 @@ class PaymentSerializer(serializers.ModelSerializer):
                         doc.alanube_id = result.get('track_id', '')
                         doc.sent_at = datetime.now()
                         motor_doc_id = result.get('raw', {}).get('id')
+                        motor_token = result.get('motor_token', '')
                         doc.save(update_fields=['status', 'ncf', 'xml_content', 'alanube_id', 'sent_at'])
                     except ECFEngineError as e:
                         doc.status = 'failed'
@@ -128,7 +130,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
                     if motor_doc_id and doc.status == 'sent':
                         try:
-                            consulta = consultar_estado(motor_doc_id, result.get('motor_token', ''))
+                            consulta = consultar_estado(motor_doc_id, motor_token)
                             dgii_estado = consulta.get('estado', '').lower()
                             if 'aceptado' in dgii_estado:
                                 doc.status = 'accepted'

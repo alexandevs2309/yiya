@@ -15,6 +15,8 @@ def get_business_config():
             'address': config.address,
             'phone': config.phone,
             'email': config.email,
+            'municipio': config.municipio,
+            'provincia': config.provincia,
             'logo': config.logo.url if config.logo else None,
         }
     except Exception:
@@ -24,5 +26,7 @@ def get_business_config():
             'address': 'Samaná, República Dominicana',
             'phone': '',
             'email': '',
+            'municipio': 'Samaná',
+            'provincia': 'Samaná',
             'logo': None,
         }
