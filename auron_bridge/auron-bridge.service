@@ -1,0 +1,18 @@
+[Unit]
+Description=AURON Print Bridge — D'Yiya POS ESC/POS Thermal Printing
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=alexander
+WorkingDirectory=/home/alexander/Escritorio/yiya_premiun/auron_bridge
+ExecStart=/home/alexander/Escritorio/yiya_premiun/auron_bridge/venv/bin/python main.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

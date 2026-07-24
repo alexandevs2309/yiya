@@ -1,0 +1,300 @@
+/* ==========================================================================
+   D'Yiya Design System — Paleta Caribeña
+   Inspirado en los colores de Samaná, República Dominicana
+   ========================================================================== */
+
+/* ─── Raw Color Palette (oklch) ───────────────────────────────────────── */
+:root {
+  --color-azul-petroleo-50: oklch(0.97 0.01 235);
+  --color-azul-petroleo-100: oklch(0.92 0.03 235);
+  --color-azul-petroleo-200: oklch(0.85 0.05 235);
+  --color-azul-petroleo-300: oklch(0.75 0.08 235);
+  --color-azul-petroleo-400: oklch(0.65 0.12 235);
+  --color-azul-petroleo-500: oklch(0.55 0.16 235);
+  --color-azul-petroleo-600: oklch(0.45 0.16 235);
+  --color-azul-petroleo-700: oklch(0.35 0.14 235);
+  --color-azul-petroleo-800: oklch(0.25 0.10 235);
+  --color-azul-petroleo-900: oklch(0.17 0.06 235);
+  --color-azul-petroleo-950: oklch(0.12 0.04 235);
+
+  --color-arena-50: oklch(0.98 0.01 80);
+  --color-arena-100: oklch(0.95 0.02 80);
+  --color-arena-200: oklch(0.90 0.03 80);
+  --color-arena-300: oklch(0.85 0.04 80);
+  --color-arena-400: oklch(0.78 0.05 80);
+  --color-arena-500: oklch(0.72 0.06 80);
+  --color-arena-600: oklch(0.65 0.06 80);
+  --color-arena-700: oklch(0.55 0.05 80);
+  --color-arena-800: oklch(0.45 0.04 80);
+  --color-arena-900: oklch(0.35 0.03 80);
+
+  --color-dorado-champan-50: oklch(0.97 0.02 65);
+  --color-dorado-champan-100: oklch(0.93 0.04 65);
+  --color-dorado-champan-200: oklch(0.88 0.06 65);
+  --color-dorado-champan-300: oklch(0.80 0.09 65);
+  --color-dorado-champan-400: oklch(0.72 0.12 65);
+  --color-dorado-champan-500: oklch(0.65 0.15 65);
+  --color-dorado-champan-600: oklch(0.58 0.15 65);
+  --color-dorado-champan-700: oklch(0.50 0.13 65);
+  --color-dorado-champan-800: oklch(0.42 0.10 65);
+  --color-dorado-champan-900: oklch(0.32 0.07 65);
+
+  --color-coral-50: oklch(0.97 0.02 25);
+  --color-coral-100: oklch(0.93 0.05 25);
+  --color-coral-200: oklch(0.87 0.08 25);
+  --color-coral-300: oklch(0.78 0.12 25);
+  --color-coral-400: oklch(0.70 0.16 25);
+  --color-coral-500: oklch(0.62 0.19 25);
+  --color-coral-600: oklch(0.55 0.19 25);
+  --color-coral-700: oklch(0.47 0.17 25);
+  --color-coral-800: oklch(0.38 0.13 25);
+  --color-coral-900: oklch(0.28 0.08 25);
+
+  --color-verde-salvia-50: oklch(0.97 0.01 140);
+  --color-verde-salvia-100: oklch(0.93 0.03 140);
+  --color-verde-salvia-200: oklch(0.88 0.05 140);
+  --color-verde-salvia-300: oklch(0.80 0.07 140);
+  --color-verde-salvia-400: oklch(0.72 0.09 140);
+  --color-verde-salvia-500: oklch(0.64 0.11 140);
+  --color-verde-salvia-600: oklch(0.56 0.11 140);
+  --color-verde-salvia-700: oklch(0.48 0.09 140);
+  --color-verde-salvia-800: oklch(0.38 0.07 140);
+  --color-verde-salvia-900: oklch(0.28 0.04 140);
+
+  --color-marfil-50: oklch(0.99 0.005 90);
+  --color-marfil-100: oklch(0.97 0.01 90);
+  --color-marfil-200: oklch(0.94 0.015 90);
+  --color-marfil-300: oklch(0.90 0.02 90);
+  --color-marfil-400: oklch(0.85 0.025 90);
+  --color-marfil-500: oklch(0.80 0.03 90);
+  --color-marfil-600: oklch(0.73 0.03 90);
+  --color-marfil-700: oklch(0.65 0.025 90);
+  --color-marfil-800: oklch(0.55 0.02 90);
+  --color-marfil-900: oklch(0.45 0.015 90);
+  
+  --color-marfil-200-dark: oklch(0.94 0.015 90);
+}
+
+/* ─── Global Theme (SaaS Premium) - Light Mode ──────────────────────────── */
+:root, :root.light {
+  --color-background: #F8FAFC;
+  --color-foreground: #1E293B;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1E293B;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1E293B;
+  
+  --color-primary: #E15A2B;
+  --color-primary-foreground: #FFFFFF;
+  
+  --color-secondary: #E2E8F0;
+  --color-secondary-foreground: #1E293B;
+  
+  --color-muted: #E2E8F0;
+  --color-muted-foreground: #64748B;
+  
+  --color-accent: #E15A2B;
+  --color-accent-foreground: #FFFFFF;
+  
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+  
+  --color-success: #10B981;
+  --color-success-foreground: #FFFFFF;
+  
+  --color-warning: #F59E0B;
+  --color-warning-foreground: #FFFFFF;
+  
+  --color-border: #E2E8F0;
+  --color-input: #FFFFFF;
+  --color-ring: #E15A2B;
+  
+  --color-sidebar: #1E293B;
+  --color-sidebar-foreground: #94A3B8;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.10), 0 4px 6px -4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.12), 0 8px 10px -6px rgba(0,0,0,0.05);
+  --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+  --shadow-glow: 0 0 20px rgba(225, 90, 43, 0.25);
+}
+
+/* ─── Global Theme (SaaS Premium) - Dark Mode ───────────────────────────── */
+:root.dark {
+  --color-background: #0F172A;
+  --color-foreground: #F8FAFC;
+  --color-card: #1E293B;
+  --color-card-foreground: #F8FAFC;
+  --color-popover: #1E293B;
+  --color-popover-foreground: #F8FAFC;
+  
+  --color-primary: #E15A2B;
+  --color-primary-foreground: #FFFFFF;
+  
+  --color-secondary: #334155;
+  --color-secondary-foreground: #F8FAFC;
+  
+  --color-muted: #334155;
+  --color-muted-foreground: #94A3B8;
+  
+  --color-accent: #E15A2B;
+  --color-accent-foreground: #FFFFFF;
+  
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+  
+  --color-success: #10B981;
+  --color-success-foreground: #FFFFFF;
+  
+  --color-warning: #F59E0B;
+  --color-warning-foreground: #FFFFFF;
+  
+  --color-border: #334155;
+  --color-input: #1E293B;
+  --color-ring: #E15A2B;
+  
+  --color-sidebar: #020617;
+  --color-sidebar-foreground: #94A3B8;
+
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-2xl: none;
+  --shadow-glow: 0 0 20px rgba(225, 90, 43, 0.35);
+}
+
+/* ─── Tailwind v4 Theme Tokens ──────────────────────────────────────────── */
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: "Cormorant Garamond", "Georgia", serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-number: "Inter", system-ui, sans-serif;
+  --font-kds: "Inter", system-ui, sans-serif;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  --duration-instant: 0ms;
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-popover: var(--color-popover);
+  --color-popover-foreground: var(--color-popover-foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-success: var(--color-success);
+  --color-success-foreground: var(--color-success-foreground);
+  --color-warning: var(--color-warning);
+  --color-warning-foreground: var(--color-warning-foreground);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--color-ring);
+  --color-sidebar: var(--color-sidebar);
+  --color-sidebar-foreground: var(--color-sidebar-foreground);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+  --shadow-glow: var(--shadow-glow);
+}
+
+/* ─── Chart Tokens ──────────────────────────────────────────────────────── */
+:root, :root.dark {
+  --chart-color-1: var(--color-azul-petroleo-400);
+  --chart-color-2: var(--color-verde-salvia-400);
+  --chart-color-3: var(--color-dorado-champan-400);
+  --chart-color-4: var(--color-coral-500);
+  --chart-color-5: var(--color-arena-400);
+  --chart-color-6: var(--color-muted-foreground);
+  --chart-bar-width: 24px;
+  --chart-bar-radius: 6px;
+  --chart-category-gap: 24px;
+  --chart-animation-duration: 800ms;
+  --chart-animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --chart-grid-color: var(--color-border);
+  --chart-grid-opacity: 0.3;
+  --chart-axis-color: var(--color-muted-foreground);
+  --chart-tick-size: 0;
+  --chart-tooltip-bg: var(--color-card);
+  --chart-tooltip-border: var(--color-border);
+  --chart-tooltip-radius: var(--radius-md);
+  --chart-tooltip-padding: 12px 16px;
+  --chart-tooltip-font-size: 13px;
+  --chart-tooltip-shadow: var(--shadow-lg);
+  --chart-legend-gap: 16px;
+  --chart-legend-item-gap: 8px;
+  --chart-legend-font-size: 13px;
+}
+
+:root.light {
+  --chart-grid-opacity: 0.4;
+}
+
+/* ─── Modo Sol — Alto contraste para exteriores ────────────────────────── */
+html.modo-sol {
+  --color-background: #FFFFFF !important;
+  --color-foreground: #0F1117 !important;
+  --color-card: #FFFFFF !important;
+  --color-card-foreground: #0F1117 !important;
+  --color-popover: #FFFFFF !important;
+  --color-popover-foreground: #0F1117 !important;
+  --color-primary: #075985 !important;
+  --color-primary-foreground: #FFFFFF !important;
+  --color-secondary: #F1F5F9 !important;
+  --color-secondary-foreground: #0F1117 !important;
+  --color-muted: #CBD5E1 !important;
+  --color-muted-foreground: #334155 !important;
+  --color-accent: #92400E !important;
+  --color-accent-foreground: #FFFFFF !important;
+  --color-destructive: #BE123C !important;
+  --color-destructive-foreground: #FFFFFF !important;
+  --color-success: #047857 !important;
+  --color-success-foreground: #FFFFFF !important;
+  --color-warning: #92400E !important;
+  --color-warning-foreground: #FFFFFF !important;
+  --color-border: #64748B !important;
+  --color-input: #FFFFFF !important;
+  --color-ring: #0F1117 !important;
+  --color-sidebar: #F8FAFC !important;
+  --color-sidebar-foreground: #0F1117 !important;
+
+  --shadow-sm: none !important;
+  --shadow-md: none !important;
+  --shadow-lg: none !important;
+  --shadow-xl: none !important;
+  --shadow-2xl: none !important;
+  --shadow-glow: none !important;
+
+  font-size: 18px;
+}
+
+html.modo-sol * {
+  border-color: var(--color-border) !important;
+}

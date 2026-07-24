@@ -1,0 +1,37 @@
+{
+  "name": "d'yiya-restaurant's",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexandevs2309/yiya_premiun.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alexandevs2309/yiya_premiun/issues"
+  },
+  "homepage": "https://github.com/alexandevs2309/yiya_premiun#readme",
+  "devDependencies": {
+    "black": "^0.3.0",
+    "eslint": "^10.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.4",
+    "ruff": "^1.5.4"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,tsx,css}": "prettier --write",
+    "backend/**/*.py": "black"
+  }
+}
